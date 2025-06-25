@@ -44,13 +44,13 @@ def ingest_reading(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
-    # 1️⃣ store the raw reading
+    # 1 store the raw reading
     reading = models.SensorReading(**data.model_dump())
     db.add(reading)
     db.commit()
     db.refresh(reading)
 
-    # 2️⃣ find LEDs linked to this sensor
+    # 2 find LEDs linked to this sensor
     led_rows = (
         db.query(models.Led.id)
         .join(models.sensor_led_map)
@@ -59,10 +59,10 @@ def ingest_reading(
     )
     led_ids = [row.id for row in led_rows]
 
-    # 3️⃣ compute brightness and schedule persistence
+    # 3 compute brightness and schedule persistence
     level = calculate_level(data.lux, data.people)
     background_tasks.add_task(persist_brightness, db, led_ids, level)
 
-    # 4️⃣ (optional) trigger the actual hardware update here, e.g. via MQTT
+    # 4 (optional) trigger the actual hardware update here, e.g. via MQTT
 
     return reading
