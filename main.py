@@ -1,12 +1,23 @@
 # main.py
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine  # create_engine code lives in database.py
+from database import SessionLocal, engine, get_db # create_engine code lives in database.py
 import models, schemas
+from fastapi.middleware.cors import CORSMiddleware
+from led_routers import router as led_router
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Adaptive Lighting API", version="1.0")
+app.include_router(led_router)
+
+# allow Streamlit (localhost:8501) to call the API during dev
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8501"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = SessionLocal()

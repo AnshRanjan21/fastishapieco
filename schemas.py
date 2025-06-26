@@ -12,8 +12,24 @@ class SensorReadingOut(SensorReadingIn):
     ts: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class BrightnessOut(BaseModel):
     led_id: int
     level: int
+
+
+
+class LedOut(BaseModel):
+    id: int
+    wattage: float          # e.g. 18.75
+
+    class Config:
+        from_attributes = True
+
+class BrightnessPoint(BaseModel):
+    ts: datetime
+    level: int
+
+    class Config:
+        from_attributes = True
